@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
-
+import { getAuth } from "firebase/auth";
 const firebaseConfig = {
   apiKey: "AIzaSyA__DWH1BvUh0xRu_PtMqyChMzgNMxnXYE",              // paste your config here
   authDomain: "smart-gym-app-4be95.firebaseapp.com",
@@ -15,3 +15,4 @@ const firebaseConfig = {
 // Initialize Firebase
  export const app = initializeApp(firebaseConfig);
 export const db = getDatabase(app);
+export const auth = getAuth(app);

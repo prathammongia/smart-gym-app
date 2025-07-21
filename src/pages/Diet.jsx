@@ -10,13 +10,13 @@ function Diet() {
   const generatePlan = async () => {
     setLoading(true);
     setResult("");
-    const apiKey = "5fd3ceaeda55392608c479eab6961fd491bbda2a1999b0e2d0c512d5b9cb1e10"; // Replace with your real API key
 
+    const apiKey = "tgp_v1_llV_B5fr8-je5TH9N9aAYELdfDaT1B5KME9YM5JLex4tgp_v1_llV_B5fr8-je5TH9N9aAYELdfDaT1B5KME9YM5JLex4"; // Replace this with your Together.ai key
     const prompt = `Generate a detailed gym workout routine and diet chart for a ${level} who wants to ${goal}.`;
 
     try {
       const response = await axios.post(
-        "https://api.together.xyz/inference",
+        "https://api.together.xyz/v1",
         {
           model: "mistralai/Mixtral-8x7B-Instruct",
           prompt,
@@ -32,7 +32,8 @@ function Diet() {
         }
       );
 
-      setResult(response.data.output || "No response");
+      const text = response.data?.choices?.[0]?.text?.trim();
+      setResult(text || "No result from AI.");
     } catch (error) {
       console.error(error);
       setResult("❌ Error fetching plan. Please try again.");
