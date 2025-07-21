@@ -1,47 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto&display=swap');
+
 .login-container {
   max-width: 400px;
   margin: 60px auto;
   padding: 40px;
-  background-color: #1e1e1e;
-  color: #fff;
+  background-color: #1B4353; /* dark navy */
+  color: #f0f8ff;
   border-radius: 12px;
-  box-shadow: 0 0 15px #00ff85aa;
+  box-shadow: 0 0 20px rgba(109, 174, 219, 0.4); /* soft blue glow */
   font-family: 'Roboto', sans-serif;
 }
 
 .login-container h2 {
   text-align: center;
-  color: #00ff85;
+  color: #6DAEDB;
+  font-family: 'Orbitron', sans-serif;
   margin-bottom: 30px;
+  font-size: 2rem;
+  letter-spacing: 1px;
 }
 
 form input {
   width: 100%;
   padding: 12px;
   margin-bottom: 15px;
-  border: 2px solid #00ff85;
+  border: 2px solid #6DAEDB;
   border-radius: 8px;
-  background-color: #121212;
-  color: #fff;
+  background-color: #173753;
+  color: #f0f0f0;
+  font-size: 1rem;
+}
+
+form input::placeholder {
+  color: #bcd3e8;
 }
 
 button {
-  background-color: #00ff85;
+  background-color: #2892D7;
   border: none;
   padding: 12px;
   width: 100%;
   border-radius: 8px;
   font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s ease;
+  color: #ffffff;
 }
 
 button:hover {
-  background-color: #00cc6e;
+  background-color: #1D70A2;
 }
 
 .error {
-  color: red;
+  color: #ff6b6b;
   margin-bottom: 10px;
   font-size: 0.95rem;
 }
@@ -49,13 +61,20 @@ button:hover {
 p {
   margin-top: 15px;
   text-align: center;
+  font-size: 0.95rem;
 }
 
 p button {
   background: none;
-  color: #00ff85;
+  color: #6DAEDB;
   border: none;
   cursor: pointer;
   text-decoration: underline;
   font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+p button:hover {
+  color: #ffffff;
 }
