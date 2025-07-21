@@ -1,157 +1,6 @@
-
-
-
-
-// import React, { useState } from "react";
-// import { db } from "../firebase";
-// import { ref, push } from "firebase/database";
-// import { getAuth } from "firebase/auth";
-// import './CheckIn.css';
-
-// function CheckIn() {
-//   const [userInGym, setUserInGym] = useState(false);
-//   const [selectedBodyPart, setSelectedBodyPart] = useState("");
-//   const [gymData, setGymData] = useState({
-//     peopleInGym: 0,
-//     bodyParts: {
-//       Chest: 0,
-//       Back: 0,
-//       Legs: 0,
-//       Arms: 0,
-//       Shoulders: 0,
-//       Core: 0
-//     }
-//   });
-
-//   const handleToggleChange = (e) => {
-//     const auth = getAuth();
-//     const user = auth.currentUser;
-//     if (!user) return alert("User not logged in");
-
-//     const uid = user.uid;
-//     const checked = e.target.checked;
-//     setUserInGym(checked);
-
-//     const data = {
-//       uid,
-//       timestamp: Date.now(),
-//       action: checked ? 'check-in' : 'check-out',
-//       muscleGroup: selectedBodyPart || null,
-//     };
-
-//     if (checked) {
-//       setGymData(prev => ({
-//         ...prev,
-//         peopleInGym: prev.peopleInGym + 1
-//       }));
-//     } else {
-//       setGymData(prev => ({
-//         ...prev,
-//         peopleInGym: prev.peopleInGym - 1,
-//         bodyParts: {
-//           ...prev.bodyParts,
-//           [selectedBodyPart]: selectedBodyPart
-//             ? prev.bodyParts[selectedBodyPart] - 1
-//             : 0
-//         }
-//       }));
-//       setSelectedBodyPart("");
-//     }
-
-//     push(ref(db, 'check-ins'), data);
-//   };
-
-//   const handleBodyPartChange = (e) => {
-//     const newPart = e.target.value;
-//     const auth = getAuth();
-//     const user = auth.currentUser;
-//     if (!user) return alert("User not logged in");
-
-//     const uid = user.uid;
-
-//     if (selectedBodyPart) {
-//       setGymData(prev => ({
-//         ...prev,
-//         bodyParts: {
-//           ...prev.bodyParts,
-//           [selectedBodyPart]: prev.bodyParts[selectedBodyPart] - 1
-//         }
-//       }));
-//     }
-
-//     setGymData(prev => ({
-//       ...prev,
-//       bodyParts: {
-//         ...prev.bodyParts,
-//         [newPart]: prev.bodyParts[newPart] + 1
-//       }
-//     }));
-
-//     setSelectedBodyPart(newPart);
-
-//     push(ref(db, 'check-ins'), {
-//       uid,
-//       timestamp: Date.now(),
-//       action: 'select-body-part',
-//       muscleGroup: newPart
-//     });
-//   };
-
-//   return (
-//     <div className="container">
-//       <h1>Gym Sync</h1>
-
-//       <div className="toggle-container">
-//         <label className="toggle-label" htmlFor="inGymToggle">In Gym</label>
-//         <label className="toggle-switch">
-//           <input
-//             type="checkbox"
-//             id="inGymToggle"
-//             checked={userInGym}
-//             onChange={handleToggleChange}
-//           />
-//           <span className="slider"></span>
-//         </label>
-//       </div>
-
-//       <label htmlFor="bodyPartSelect">Select Body Part Training Today:</label>
-//       <select
-//         id="bodyPartSelect"
-//         disabled={!userInGym}
-//         value={selectedBodyPart}
-//         onChange={handleBodyPartChange}
-//       >
-//         <option value="">Select body part</option>
-//         <option value="Chest">Chest</option>
-//         <option value="Back">Back</option>
-//         <option value="Legs">Legs</option>
-//         <option value="Arms">Arms</option>
-//         <option value="Shoulders">Shoulders</option>
-//         <option value="Core">Core</option>
-//       </select>
-
-//       <div className="info" id="gymInfo">
-//         <h3>Current Gym Status</h3>
-//         <p>People in Gym: <span id="peopleCount">{gymData.peopleInGym}</span></p>
-//         <p>Body Part Distribution:</p>
-//         <ul id="bodyPartList">
-//           {Object.entries(gymData.bodyParts).map(([part, count]) => (
-//             <li key={part}>{part}: {count}</li>
-//           ))}
-//         </ul>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default CheckIn;
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
-import { ref, set, remove, get } from "firebase/database";
+import { ref, set, remove, get, onValue } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import "./CheckIn.css";
 
@@ -167,10 +16,12 @@ function CheckIn() {
       Arms: 0,
       Shoulders: 0,
       Core: 0,
+      Other: 0,
     },
   });
 
-  // ✅ Check if user is already checked in
+  const isValidBodyPart = selectedBodyPart !== "";
+
   useEffect(() => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -188,52 +39,88 @@ function CheckIn() {
     });
   }, []);
 
+  useEffect(() => {
+    const checkInsRef = ref(db, "check-ins");
+
+    const unsubscribe = onValue(checkInsRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      let total = 0;
+      const bodyPartsCount = {
+        Chest: 0,
+        Back: 0,
+        Legs: 0,
+        Arms: 0,
+        Shoulders: 0,
+        Core: 0,
+        Other: 0,
+      };
+
+      Object.values(data).forEach((entry) => {
+        total++;
+        const part = entry.muscleGroup;
+        if (bodyPartsCount[part] !== undefined) {
+          bodyPartsCount[part]++;
+        } else {
+          bodyPartsCount.Other++;
+        }
+      });
+
+      setGymData({
+        peopleInGym: total,
+        bodyParts: bodyPartsCount,
+      });
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const handleToggleChange = async (e) => {
+    const checked = e.target.checked;
     const auth = getAuth();
     const user = auth.currentUser;
-    if (!user) return alert("User not logged in");
+    if (!user || !isValidBodyPart) return;
 
     const uid = user.uid;
-    const checked = e.target.checked;
     setUserInGym(checked);
 
     if (checked) {
-      // ✅ Check-In
       const data = {
         uid,
         timestamp: Date.now(),
-        muscleGroup: selectedBodyPart || null,
+        muscleGroup: selectedBodyPart,
       };
       await set(ref(db, `check-ins/${uid}`), data);
+      await set(ref(db, `check-ins-history/${Date.now()}-${uid}`), data);
     } else {
-      // ✅ Check-Out
       await remove(ref(db, `check-ins/${uid}`));
       setSelectedBodyPart("");
     }
   };
 
-  const handleBodyPartChange = async (e) => {
-    const newPart = e.target.value;
-    setSelectedBodyPart(newPart);
-
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const uid = user.uid;
-
-    // ✅ Update existing check-in record with new muscle group
-    const data = {
-      uid,
-      timestamp: Date.now(),
-      muscleGroup: newPart,
-    };
-    await set(ref(db, `check-ins/${uid}`), data);
+  const handleBodyPartChange = (e) => {
+    setSelectedBodyPart(e.target.value);
   };
 
   return (
     <div className="container">
       <h1>Gym Sync</h1>
+
+      <label htmlFor="bodyPartSelect">Select Body Part Training Today:</label>
+      <select
+        id="bodyPartSelect"
+        value={selectedBodyPart}
+        onChange={handleBodyPartChange}
+        disabled={userInGym}
+      >
+        <option value="">Select body part</option>
+        <option value="Chest">Chest</option>
+        <option value="Back">Back</option>
+        <option value="Legs">Legs</option>
+        <option value="Arms">Arms</option>
+        <option value="Shoulders">Shoulders</option>
+        <option value="Core">Core</option>
+        <option value="Other">Other</option>
+      </select>
 
       <div className="toggle-container">
         <label className="toggle-label" htmlFor="inGymToggle">
@@ -245,26 +132,11 @@ function CheckIn() {
             id="inGymToggle"
             checked={userInGym}
             onChange={handleToggleChange}
+            disabled={!isValidBodyPart}
           />
           <span className="slider"></span>
         </label>
       </div>
-
-      <label htmlFor="bodyPartSelect">Select Body Part Training Today:</label>
-      <select
-        id="bodyPartSelect"
-        disabled={!userInGym}
-        value={selectedBodyPart}
-        onChange={handleBodyPartChange}
-      >
-        <option value="">Select body part</option>
-        <option value="Chest">Chest</option>
-        <option value="Back">Back</option>
-        <option value="Legs">Legs</option>
-        <option value="Arms">Arms</option>
-        <option value="Shoulders">Shoulders</option>
-        <option value="Core">Core</option>
-      </select>
 
       <div className="info" id="gymInfo">
         <h3>Current Gym Status</h3>
