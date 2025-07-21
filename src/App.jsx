@@ -89,105 +89,201 @@
 // export default App;
 
 
-
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from "react-router-dom";
+// App.jsx
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Link,
+  useNavigate,
+} from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { getDatabase, ref, get } from "firebase/database";
 import { app } from "./firebase";
+import Home from "./pages/Home";
+import CheckIn from "./pages/CheckIn";
+import Diet from "./pages/Diet";
+import Admin from "./pages/Admin";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import AdminProfile from "./pages/AdminProfile";
 
-import Home from './pages/Home';
-import CheckIn from './pages/CheckIn';
-import Profile from './pages/Profile';
-import Admin from './pages/Admin';
-import Login from './pages/Login';
-import Diet from './pages/Diet';
+function NavigationBar({ onToggleProfile, role }) {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const auth = getAuth();
+    await signOut(auth);
+    navigate("/login");
+  };
+
+  return (
+    <nav
+      style={{
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        padding: "10px",
+        backgroundColor: "#f8f9fa",
+        position: "relative",
+        zIndex: 1000,
+      }}
+    >
+      <Link to="/" style={{ marginRight: "20px" }}>
+        Home
+      </Link>
+      {role === "user" && (
+        <>
+          <Link to="/check-in" style={{ marginRight: "20px" }}>
+            Check-In
+          </Link>
+          <Link to="/diet" style={{ marginRight: "20px" }}>
+            Diet Plan
+          </Link>
+        </>
+      )}
+      {role === "admin" && (
+        <Link to="/admin" style={{ marginRight: "20px" }}>
+          Admin Dashboard
+        </Link>
+      )}
+
+      <div style={{ marginLeft: "auto" }}>
+        <button
+          onClick={onToggleProfile}
+          style={{
+            background: "none",
+            border: "none",
+            color: "green",
+            fontSize: "24px",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
+        >
+          ☰
+        </button>
+      </div>
+    </nav>
+  );
+}
+
+function AppContent({ user, role, showProfile, setShowProfile }) {
+  return (
+    <div
+      style={{
+        position: "relative",
+        maxWidth: "420px",
+        height: "100vh",
+        margin: "0 auto",
+        overflow: "hidden",
+        border: "1px solid #ccc",
+        borderRadius: "8px",
+      }}
+    >
+      <div
+        className="main-container"
+        style={{
+          padding: "80px 20px 20px",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
+        <Routes>
+          <Route path="/" element={<Home />} />
+          {role === "user" && (
+            <>
+              <Route path="/check-in" element={<CheckIn />} />
+              <Route path="/diet" element={<Diet />} />
+            </>
+          )}
+          {role === "admin" && <Route path="/admin" element={<Admin />} />}
+          <Route path="/login" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+
+      {/* Sliding Profile/AdminProfile */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          right: showProfile ? 0 : "-100%",
+          height: "100%",
+          width: "100%",
+          maxWidth: "80%",
+          backgroundColor: "white",
+          transition: "right 0.3s ease-in-out",
+          zIndex: 2,
+          overflowY: "auto",
+          boxShadow: "-2px 0 8px rgba(0,0,0,0.2)",
+        }}
+      >
+        {role === "admin" ? (
+          <AdminProfile
+            onClose={() => setShowProfile(false)}
+            onLogout={() => setShowProfile(false)}
+          />
+        ) : (
+          <Profile
+            onClose={() => setShowProfile(false)}
+            onLogout={() => setShowProfile(false)}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showProfile, setShowProfile] = useState(false);
+
   const auth = getAuth(app);
-
-  // Add LogoutButton component inside App
-  function LogoutButton() {
-    const navigate = useNavigate();
-
-    const handleLogout = async () => {
-      try {
-        await signOut(auth);
-        navigate("/login");
-      } catch (error) {
-        console.error("Logout error:", error);
-      }
-    };
-
-    return (
-      <button
-        onClick={handleLogout}
-        style={{
-          marginLeft: "5px",
-          padding: "5px 10px",
-          backgroundColor: "#28a745", // green color
-          color: "#fff",
-          border: "none",
-          borderRadius: "10px",
-          cursor: "pointer",
-        }}
-      >
-        Logout
-      </button>
-    );
-  }
-
-
+  const db = getDatabase(app);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        try {
+          const roleRef = ref(db, `users/${currentUser.uid}/role`);
+          const snapshot = await get(roleRef);
+          setRole(snapshot.exists() ? snapshot.val() : "user");
+        } catch {
+          setRole("user");
+        }
+      } else {
+        setUser(null);
+        setRole(null);
+      }
+      setShowProfile(false); // Reset profile panel on auth change
       setLoading(false);
     });
+
     return () => unsubscribe();
-  }, [auth]);
+  }, []);
 
   if (loading) {
-    return <div style={{ color: "#0f0", textAlign: "center" }}>Loading...</div>;
+    return <div style={{ textAlign: "center", paddingTop: "50px" }}>Loading...</div>;
   }
 
-   return (
+  return (
     <Router>
       {user ? (
         <>
-          <nav
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              padding: "10px",
-              backgroundColor: "#f8f9fa",
-              position: "relative",
-            }}
-          >
-            <Link to="/" style={{ marginRight: "20px" }}>Home</Link>
-            <Link to="/check-in" style={{ marginRight: "20px" }}>Check-In</Link>
-            <Link to="/profile" style={{ marginRight: "20px" }}>Profile</Link>
-            <Link to="/admin" style={{ marginRight: "20px" }}>Admin</Link>
-            <Link to="/diet" style={{ marginRight: "20px" }}>Diet Plan</Link>
-
-            {/* Push logout button to the right */}
-            <div style={{ marginLeft: "auto" }}>
-              <LogoutButton />
-            </div>
-          </nav>
-
-          <div className="container" style={{ padding: "100px", margin:"0px",maxWidth:"1000px" }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/check-in" element={<CheckIn />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/diet" element={<Diet />} />
-              <Route path="/login" element={<Navigate to="/" replace />} />
-            </Routes>
-          </div>
+          <NavigationBar
+            onToggleProfile={() => setShowProfile((prev) => !prev)}
+            role={role}
+          />
+          <AppContent
+            user={user}
+            role={role}
+            showProfile={showProfile}
+            setShowProfile={setShowProfile}
+          />
         </>
       ) : (
         <Routes>
@@ -198,7 +294,20 @@ function App() {
     </Router>
   );
 }
+
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Converted from React Native to React Web (JSX)
