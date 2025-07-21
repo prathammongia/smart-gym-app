@@ -15,12 +15,18 @@ body {
 }
 
 .container {
-  background-color: #1e1e1e;
-  padding: 30px 25px;
-  border-radius: 12px;
-  max-width: 420px;
-  width: 100%;
-  box-shadow: 0 0 20px rgba(0, 255, 128, 0.4);
+  top: 10px;
+  max-width: 600px;
+  margin: auto;
+  padding: 10;
+  background-color: #fff;
+  border-radius: 8px;
+  height: 100%;
+  overflow: auto; 
+  box-sizing: border-box;
+}
+.container::-webkit-scrollbar {
+  display: none;
 }
 
 h1 {
