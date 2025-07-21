@@ -11,7 +11,10 @@ function DietPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
 
-  const apiKey = "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";
+
+  const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+
+
 
   const generatePlan = async () => {
     setLoading(true);
