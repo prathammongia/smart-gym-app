@@ -13,8 +13,7 @@ function DietPage() {
 
 
   const apiKey = import.meta.env.VITE_GROQ_API_KEY;
-
-
+  // Never hardcode API keys - always use environment variables
 
   const generatePlan = async () => {
     setLoading(true);
