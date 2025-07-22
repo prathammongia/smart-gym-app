@@ -174,22 +174,36 @@ function AppContent({ user, role, showProfile, setShowProfile }) {
     <div
       style={{
         position: "relative",
-        maxWidth: "420px",
+        width: "100%",
+        maxWidth: "480px",
         height: "100vh",
         margin: "0 auto",
-        overflow: "hidden",
+        overflow: "hidden", // prevent outer scroll
         border: "1px solid #ccc",
         borderRadius: "8px",
       }}
     >
+      {/* Main content scrollable container */}
       <div
         className="main-container"
         style={{
           padding: "80px 20px 20px",
-          position: "relative",
-          zIndex: 1,
+          height: "100%",
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
+          scrollbarWidth: "none", // Firefox
+          msOverflowStyle: "none", // IE/Edge
         }}
       >
+        {/* Hide scrollbar for WebKit browsers */}
+        <style>
+          {`
+            .main-container::-webkit-scrollbar {
+              display: none;
+            }
+          `}
+        </style>
+
         <Routes>
           <Route path="/" element={<Home />} />
           {role === "user" && (
@@ -203,22 +217,30 @@ function AppContent({ user, role, showProfile, setShowProfile }) {
         </Routes>
       </div>
 
-      {/* Sliding Profile/AdminProfile */}
+      {/* Sliding Profile/Admin Profile */}
       <div
         style={{
           position: "absolute",
           top: 0,
           right: showProfile ? 0 : "-100%",
           height: "100%",
-          width: "100%",
-          maxWidth: "80%",
+          width: "80%",
           backgroundColor: "white",
           transition: "right 0.3s ease-in-out",
           zIndex: 2,
           overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
           boxShadow: "-2px 0 8px rgba(0,0,0,0.2)",
         }}
       >
+        <style>
+          {`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}
+        </style>
+
         {role === "admin" ? (
           <AdminProfile
             onClose={() => setShowProfile(false)}
@@ -259,7 +281,7 @@ function App() {
         setUser(null);
         setRole(null);
       }
-      setShowProfile(false); // Reset profile panel on auth change
+      setShowProfile(false); // Close profile on login/logout
       setLoading(false);
     });
 
@@ -296,6 +318,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
