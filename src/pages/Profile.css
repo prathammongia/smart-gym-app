@@ -1,0 +1,32 @@
+.profile-form input {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  background-color: white;
+  color: #222; /* ← Dark text color */
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-form input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.profile-form label {
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: block;
+}
+.profile-form label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff; /* Tailwind slate-800 */
+  margin-bottom: 8px;
+  display: block;
+  letter-spacing: 0.3px;
+}
