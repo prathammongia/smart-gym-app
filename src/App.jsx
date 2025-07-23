@@ -102,6 +102,7 @@ import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { getDatabase, ref, get } from "firebase/database";
 import { app } from "./firebase";
+
 import Home from "./pages/Home";
 import CheckIn from "./pages/CheckIn";
 import Diet from "./pages/Diet";
@@ -109,6 +110,7 @@ import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import AdminProfile from "./pages/AdminProfile";
+import CheckInHistory from "./pages/CheckInHistory"; // ✅ NEW
 
 function NavigationBar({ onToggleProfile, role }) {
   const navigate = useNavigate();
@@ -178,12 +180,11 @@ function AppContent({ user, role, showProfile, setShowProfile }) {
         maxWidth: "480px",
         height: "100vh",
         margin: "0 auto",
-        overflow: "hidden", // prevent outer scroll
+        overflow: "hidden",
         border: "1px solid #ccc",
         borderRadius: "8px",
       }}
     >
-      {/* Main content scrollable container */}
       <div
         className="main-container"
         style={{
@@ -191,11 +192,10 @@ function AppContent({ user, role, showProfile, setShowProfile }) {
           height: "100%",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
-          scrollbarWidth: "none", // Firefox
-          msOverflowStyle: "none", // IE/Edge
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
         }}
       >
-        {/* Hide scrollbar for WebKit browsers */}
         <style>
           {`
             .main-container::-webkit-scrollbar {
@@ -210,14 +210,25 @@ function AppContent({ user, role, showProfile, setShowProfile }) {
             <>
               <Route path="/check-in" element={<CheckIn />} />
               <Route path="/diet" element={<Diet />} />
+              <Route
+                path="/check-in-history"
+                element={<CheckInHistory />} // ✅ NEW
+              />
             </>
           )}
-          {role === "admin" && <Route path="/admin" element={<Admin />} />}
+          {role === "admin" && (
+            <>
+              <Route path="/admin" element={<Admin />} />
+              <Route
+                path="/check-in-history"
+                element={<CheckInHistory />} // ✅ Shared if admin wants access too
+              />
+            </>
+          )}
           <Route path="/login" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
 
-      {/* Sliding Profile/Admin Profile */}
       <div
         style={{
           position: "absolute",
@@ -281,7 +292,7 @@ function App() {
         setUser(null);
         setRole(null);
       }
-      setShowProfile(false); // Close profile on login/logout
+      setShowProfile(false);
       setLoading(false);
     });
 
@@ -318,6 +329,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
