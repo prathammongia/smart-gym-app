@@ -1,32 +1,70 @@
-.profile-form input {
-  width: 100%;
-  padding: 10px 16px;
-  border-radius: 999px;
-  border: 1px solid #ccc;
-  background-color: white;
-  color: #222; /* ← Dark text color */
-  font-size: 15px;
+.profile-container {
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 28px 24px;
+  background-color: #ffffff;
+  color: #222;
   font-family: 'Poppins', sans-serif;
-  transition: border 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  text-align: center;
 }
 
-.profile-form input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+.profile-header {
+  margin-bottom: 24px;
 }
 
-.profile-form label {
-  color: #333;
-  font-weight: 500;
-  margin-bottom: 4px;
-  display: block;
-}
-.profile-form label {
-  font-size: 0.95rem;
+.profile-title {
+  font-size: 26px;
   font-weight: 600;
-  color: #ffffff; /* Tailwind slate-800 */
-  margin-bottom: 8px;
-  display: block;
-  letter-spacing: 0.3px;
+  color: #007bff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.profile-summary {
+  margin-top: 20px;
+  text-align: left;
+  padding: 0 4px;
+}
+
+.profile-summary p {
+  font-size: 16px;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.profile-buttons,
+.logout-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.profile-btn {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.profile-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Add a little spacing above logout for separation */
+.logout-container {
+  margin-top: 36px;
 }
