@@ -6,7 +6,7 @@
 
 body {
   margin: 0;
-  background-color: #173753; /* deep royal navy */
+  background-color: #173753;
   color: #e0e0e0;
   font-family: 'Roboto', sans-serif;
   display: flex;
@@ -23,14 +23,13 @@ body {
   margin: auto;
   height: 100%;
   overflow: auto;
-  box-shadow: 0 0 20px rgba(109, 174, 219, 0.4); /* soft blue glow */
+  box-shadow: 0 0 20px rgba(109, 174, 219, 0.4);
 }
 
 .container::-webkit-scrollbar {
   display: none;
 }
 
-/* Title */
 h1 {
   font-family: 'Orbitron', sans-serif;
   text-align: center;
@@ -40,7 +39,6 @@ h1 {
   letter-spacing: 2px;
 }
 
-/* Toggle Switch */
 .toggle-container {
   text-align: center;
   margin-bottom: 20px;
@@ -100,7 +98,6 @@ input:checked + .slider:before {
   transform: translateX(60px);
 }
 
-/* Select Dropdown */
 label {
   display: block;
   margin-top: 20px;
@@ -128,7 +125,6 @@ select:disabled {
   cursor: not-allowed;
 }
 
-/* Info Panel */
 .info {
   margin-top: 30px;
   background-color: #11284f;
@@ -160,6 +156,8 @@ select:disabled {
   border-bottom: 1px solid #6DAEDB55;
   font-size: 1.05rem;
 }
+
+/* Modals */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -180,6 +178,7 @@ select:disabled {
   width: 90%;
   max-width: 400px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
 }
 
 .modal input {
@@ -195,4 +194,17 @@ select:disabled {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.modal.reminder {
+  background-color: #173753;
+  color: #e0e0e0;
+  border: 2px solid #6DAEDB;
+}
+
+.modal.reminder button {
+  background-color: transparent;
+  border: 2px solid #6DAEDB;
+  color: #6DAEDB;
+  font-weight: bold;
 }
