@@ -161,6 +161,7 @@
 
 
 // src/pages/Login.jsx
+// src/pages/Login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { app } from "../firebase";
@@ -204,20 +205,8 @@ function Login() {
       key: "auth",
       content: (
         <>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </>
       ),
     },
@@ -225,27 +214,9 @@ function Login() {
       key: "profile",
       content: (
         <>
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <input
-            type="number"
-            placeholder="Age"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            required
-          />
-          <input
-            type="number"
-            placeholder="Weight (kg)"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            required
-          />
+          <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
+          <input type="number" placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} required />
+          <input type="number" placeholder="Weight (kg)" value={weight} onChange={(e) => setWeight(e.target.value)} required />
         </>
       ),
     },
@@ -324,10 +295,7 @@ function Login() {
 
     try {
       if (isRegistering) {
-        if (
-          !email || !password || !name || !age || !weight ||
-          !role || !goal || !level || !gender || !dietPref || !workoutStyle
-        ) {
+        if (!email || !password || !name || !age || !weight || !role || !goal || !level || !gender || !dietPref || !workoutStyle) {
           setError("Please complete all fields before submitting.");
           return;
         }
@@ -341,20 +309,13 @@ function Login() {
           weight,
           role,
           email,
-          dietProfile: {
-            goal,
-            level,
-            gender,
-            dietPref,
-            workoutStyle,
-          },
+          dietProfile: { goal, level, gender, dietPref, workoutStyle },
         });
 
         navigate(role === "admin" ? "/admin" : "/");
       } else {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
         const snapshot = await get(ref(db, `users/${user.uid}`));
         const userData = snapshot.val();
 
@@ -371,85 +332,61 @@ function Login() {
     }
   };
 
-  const nextStep = () => {
-    if (step < steps.length - 1) setStep(step + 1);
-  };
-
-  const prevStep = () => {
-    if (step > 0) setStep(step - 1);
-  };
-
   return (
     <div className="login-container">
-      <h2>{isRegistering ? "Create Account" : "Login"}</h2>
+      <div className="login-box">
+        <h2>{isRegistering ? "Create Account" : "Login"}</h2>
+        <form onSubmit={handleSubmit} className="login-form">
+          {!isRegistering ? (
+            <>
+              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <button type="submit">Login</button>
+            </>
+          ) : (
+            <>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={steps[step].key}
+                  initial={{ x: 300, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -300, opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="slide-step"
+                >
+                  {steps[step].content}
+                </motion.div>
+              </AnimatePresence>
 
-      <form onSubmit={handleSubmit} className="login-form">
-        {!isRegistering ? (
-          <>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <button type="submit">Login</button>
-          </>
-        ) : (
-          <>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={steps[step].key}
-                initial={{ x: 300, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -300, opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className="slide-step"
-              >
-                {steps[step].content}
-              </motion.div>
-            </AnimatePresence>
+              <div className="step-buttons">
+                {step > 0 && <button type="button" onClick={() => setStep(step - 1)}>⬅ Back</button>}
+                {step < steps.length - 1 ? (
+                  <button type="button" onClick={() => setStep(step + 1)}>Next ➡</button>
+                ) : (
+                  <button type="submit">Register</button>
+                )}
+              </div>
+            </>
+          )}
+          {error && <p className="error">{error}</p>}
+        </form>
 
-            <div className="step-buttons">
-              {step > 0 && (
-                <button type="button" onClick={prevStep}>⬅ Back</button>
-              )}
-              {step < steps.length - 1 ? (
-                <button type="button" onClick={nextStep}>Next ➡</button>
-              ) : (
-                <button type="submit">Register</button>
-              )}
-            </div>
-          </>
-        )}
-
-        {error && <p className="error">{error}</p>}
-      </form>
-
-      <p>
-        {isRegistering ? "Already have an account?" : "Don't have an account?"}{" "}
-        <button
-          onClick={() => {
-            setIsRegistering(!isRegistering);
-            setStep(0);
-            setError("");
-          }}
-        >
-          {isRegistering ? "Login" : "Register"}
-        </button>
-      </p>
+        <p className="switch-mode">
+          {isRegistering ? "Already have an account?" : "Don't have an account?"}
+          <button
+            type="button"
+            onClick={() => {
+              setIsRegistering(!isRegistering);
+              setStep(0);
+              setError("");
+            }}
+          >
+            {isRegistering ? "Login" : "Register"}
+          </button>
+        </p>
+      </div>
     </div>
   );
 }
 
 export default Login;
-
-
-
