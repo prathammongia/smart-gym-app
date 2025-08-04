@@ -170,12 +170,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
-import {
-  getDatabase,
-  ref,
-  set,
-  get,
-} from "firebase/database";
+import { getDatabase, ref, set, get } from "firebase/database";
 import { AnimatePresence, motion } from "framer-motion";
 import "./Login.css";
 
@@ -336,7 +331,7 @@ function Login() {
     <div className="login-container">
       <div className="login-box">
         <h2>{isRegistering ? "Create Account" : "Login"}</h2>
-        <form onSubmit={handleSubmit} className="login-form">
+        <form onSubmit={handleSubmit} className="login-form" autoComplete="off">
           {!isRegistering ? (
             <>
               <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
