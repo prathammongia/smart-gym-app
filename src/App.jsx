@@ -40,9 +40,9 @@ function NavigationBar({ onToggleProfile, role }) {
         display: "flex",
         justifyContent: "flex-start",
         alignItems: "center",
-        padding: "10px",
+        padding: "10px 16px",
         backgroundColor: "#f8f9fa",
-        position: "relative",
+        borderBottom: "1px solid #ccc",
         zIndex: 1000,
       }}
     >
@@ -82,7 +82,6 @@ function NavigationBar({ onToggleProfile, role }) {
 function AppContent({ user, role, showProfile, setShowProfile }) {
   const location = useLocation();
 
-  // ✅ Auto-close profile panel on route change
   useEffect(() => {
     setShowProfile(false);
   }, [location.pathname]);
@@ -98,13 +97,20 @@ function AppContent({ user, role, showProfile, setShowProfile }) {
         overflow: "hidden",
         border: "1px solid #ccc",
         borderRadius: "8px",
+        backgroundColor: "#fff",
       }}
     >
+      {/* ✅ Moved NavigationBar inside the container */}
+      <NavigationBar
+        onToggleProfile={() => setShowProfile((prev) => !prev)}
+        role={role}
+      />
+
       <div
         className="main-container"
         style={{
-          padding: "80px 20px 20px",
-          height: "100%",
+          padding: "20px",
+          height: "calc(100% - 60px)",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
           scrollbarWidth: "none",
@@ -214,18 +220,12 @@ function App() {
   return (
     <Router>
       {user ? (
-        <>
-          <NavigationBar
-            onToggleProfile={() => setShowProfile((prev) => !prev)}
-            role={role}
-          />
-          <AppContent
-            user={user}
-            role={role}
-            showProfile={showProfile}
-            setShowProfile={setShowProfile}
-          />
-        </>
+        <AppContent
+          user={user}
+          role={role}
+          showProfile={showProfile}
+          setShowProfile={setShowProfile}
+        />
       ) : (
         <Routes>
           <Route path="/login" element={<Login />} />

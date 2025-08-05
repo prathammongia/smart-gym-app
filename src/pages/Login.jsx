@@ -169,8 +169,14 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  fetchSignInMethodsForEmail,
 } from "firebase/auth";
-import { getDatabase, ref, set, get } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+} from "firebase/database";
 import { AnimatePresence, motion } from "framer-motion";
 import "./Login.css";
 
@@ -295,6 +301,12 @@ function Login() {
           return;
         }
 
+        const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+        if (signInMethods.length > 0) {
+          setError("User already exists. Please login instead.");
+          return;
+        }
+
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
@@ -329,9 +341,10 @@ function Login() {
 
   return (
     <div className="login-container">
+    <div className="login-form">
       <div className="login-box">
         <h2>{isRegistering ? "Create Account" : "Login"}</h2>
-        <form onSubmit={handleSubmit} className="login-form" autoComplete="off">
+        <form onSubmit={handleSubmit} className="login-form">
           {!isRegistering ? (
             <>
               <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -379,6 +392,7 @@ function Login() {
             {isRegistering ? "Login" : "Register"}
           </button>
         </p>
+      </div>
       </div>
     </div>
   );
