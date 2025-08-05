@@ -329,9 +329,9 @@ function Login() {
 
   return (
     <div className="login-container">
-      <div className="login-box">
+      <div className="login-form">
         <h2>{isRegistering ? "Create Account" : "Login"}</h2>
-        <form onSubmit={handleSubmit} className="login-form" autoComplete="off">
+        <form onSubmit={handleSubmit} autoComplete="off">
           {!isRegistering ? (
             <>
               <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -366,8 +366,8 @@ function Login() {
           {error && <p className="error">{error}</p>}
         </form>
 
-        <p className="switch-mode">
-          {isRegistering ? "Already have an account?" : "Don't have an account?"}
+        <p className="register-text">
+          {isRegistering ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
             type="button"
             onClick={() => {
